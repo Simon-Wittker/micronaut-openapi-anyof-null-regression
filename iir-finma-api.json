@@ -1,0 +1,902 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Insurance Intermediary Registry API",
+    "description": "API zur Abfrage von Versicherungsvermittlern. Unterstützt getrennte Ressourcen für natürliche Personen (intermediaries) und juristische Personen (brokerages) sowie Mehrsprachigkeit (de, fr, it, en).",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.finma.ch/iireg"
+    }
+  ],
+  "paths": {
+    "/api/v1/generic/intermediaries/{id}": {
+      "get": {
+        "tags": [
+          "generic"
+        ],
+        "summary": "Get insurance intermediary (natural person) by ID",
+        "operationId": "get_insurance_intermediary_api_v1_generic_intermediaries__id__get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Language"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Language of the result labels (de, fr, it, en)",
+              "title": "Lang"
+            },
+            "description": "Language of the result labels (de, fr, it, en)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsuranceIntermediary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Intermediary not found"
+          },
+          "503": {
+            "description": "Service unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/generic/brokerages/{id}": {
+      "get": {
+        "tags": [
+          "generic"
+        ],
+        "summary": "Get insurance brokerage (legal entity) by ID",
+        "operationId": "get_insurance_brokerages_api_v1_generic_brokerages__id__get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Language"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Language of the result labels (de, fr, it, en)",
+              "title": "Lang"
+            },
+            "description": "Language of the result labels (de, fr, it, en)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsuranceBrokerage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Brokerage not found"
+          },
+          "503": {
+            "description": "Service unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/generic/search": {
+      "get": {
+        "tags": [
+          "generic"
+        ],
+        "summary": "Search for intermediaries or brokerages",
+        "operationId": "search_api_v1_generic_search_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Search term (minimum 3 characters)",
+              "title": "Q"
+            },
+            "description": "Search term (minimum 3 characters)"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SearchCategory"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Restrict search to a category (intermediaries or brokerages)",
+              "title": "Category"
+            },
+            "description": "Restrict search to a category (intermediaries or brokerages)"
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Language"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Language of the result labels (de, fr, it, en)",
+              "title": "Lang"
+            },
+            "description": "Language of the result labels (de, fr, it, en)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SearchResult"
+                  },
+                  "title": "Response Search Api V1 Generic Search Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No entry found"
+          },
+          "503": {
+            "description": "Service unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Address": {
+        "properties": {
+          "street": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street",
+            "description": "de: Strasse und Hausnummer fr: Rue et numéro it: Via e numero civico en: Street and house number "
+          },
+          "zip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zip",
+            "description": "de: Postleitzahl fr: Code postal it: CAP en: Postal code "
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City",
+            "description": "de: Stadt fr: Ville it: Città en: City "
+          },
+          "legal_seat": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legal Seat",
+            "description": "de: Rechtssitz fr: Siège légal it: Sede legale en: Legal seat "
+          }
+        },
+        "type": "object",
+        "title": "Address",
+        "description": "de: Adresse einer juristischen Person oder eines Vermittlers\nfr: Adresse d'une personne morale ou d'un intermédiaire\nit: Indirizzo di una persona giuridica o di un intermediario\nen: Address of a legal entity or intermediary"
+      },
+      "EntityReference": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "description": "de: Eindeutige Identifikationsnummer der referenzierten Entität fr: Identifiant unique de l'entité référencée it: Identificativo univoco dell'entità di riferimento en: Unique identifier of the referenced entity "
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "de: Name der referenzierten Entität fr: Nom de l'entité référencée it: Nome dell'entità di riferimento en: Name of the referenced entity "
+          },
+          "relation_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Beziehung zur Entität (z. B. Arbeitgeber, Arbeitnehmer) fr: Relation avec l'entité (par ex. employeur, employé) it: Relazione con l'entità (ad es. datore di lavoro, dipendente) en: Relation to the entity (e.g. employer, employee) "
+          }
+        },
+        "type": "object",
+        "title": "EntityReference",
+        "description": "de: Referenz auf eine verbundene Entität (z. B. Arbeitgeber oder Vermittler)\nfr: Référence à une entité associée (par ex. employeur ou intermédiaire)\nit: Riferimento a un'entità collegata (ad es. datore di lavoro o intermediario)\nen: Reference to an affiliated entity (e.g. employer or intermediary)"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "InsuranceBrokerage": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "description": "de: Eindeutige ID des Brokerunternehmens fr: Identifiant unique de la société de courtage it: ID univoco della società di brokeraggio en: Unique ID of the brokerage "
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "de: Name des Brokerunternehmens fr: Nom de la société de courtage it: Nome della società di brokeraggio en: Name of the brokerage "
+          },
+          "legal_form": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LegalForm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Rechtsnatur (z. B. natürliche Person) fr: Forme juridique (p. ex. personne physique) it: Forma giuridica (ad es. persona fisica) en: Legal form (e.g. natural person) "
+          },
+          "uid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uid",
+            "description": "de: Unternehmens-Identifikationsnummer (UID) fr: Numéro d'identification des entreprises (IDE) it: Numero d'identificazione delle imprese (IDI) en: Company identification number (UID) "
+          },
+          "address": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Geschäftsadresse fr: Adresse du siège it: Indirizzo della sede en: Business address "
+          },
+          "registration_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registration Date",
+            "description": "de: Registrierungsdatum (Format: YYYY-MM-DD) fr: Date d'enregistrement (format: YYYY-MM-DD) it: Data di registrazione (formato: YYYY-MM-DD) en: Registration date (format: YYYY-MM-DD) "
+          },
+          "license_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LicenseType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Zulassung als fr: Autorisation en tant que it: Autorizzazione come en: Licensed as "
+          },
+          "insurance_lines": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/InsuranceLine"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Insurance Lines",
+            "description": "de: Versicherungssparten, für die das Brokerage registriert/autorisiert ist fr: Branches d'assurance pour lesquelles le courtage est enregistré/autorisé it: Rami assicurativi per cui il brokeraggio è registrato/autorizzato en: Insurance lines the brokerage is registered/authorized for "
+          },
+          "intermediaries": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/EntityReference"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intermediaries",
+            "description": "de: Zugehörige Vermittler (Entitätenreferenzen) fr: Intermédiaires affiliés (références d'entités) it: Intermediari affiliati (riferimenti ad entità) en: Affiliated intermediaries (entity references) "
+          }
+        },
+        "type": "object",
+        "title": "InsuranceBrokerage",
+        "description": "de: Datensatz eines Versicherungsbrokers/-brokerage\nfr: Enregistrement d'un courtier/courtage d'assurance\nit: Record di un broker/intermediazione assicurativa\nen: Insurance brokerage record"
+      },
+      "InsuranceIntermediary": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "description": "de: Eindeutige ID des Versicherungsvermittlers fr: Identifiant unique de l'intermédiaire d'assurance it: Identificativo univoco dell'intermediario assicurativo en: Unique ID of the insurance intermediary "
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name",
+            "description": "de: Vorname des Vermittlers fr: Prénom de l'intermédiaire it: Nome dell'intermediario en: First name of the intermediary "
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name",
+            "description": "de: Nachname des Vermittlers fr: Nom de famille de l'intermédiaire it: Cognome dell'intermediario en: Last name of the intermediary "
+          },
+          "legal_form": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LegalForm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Rechtsnatur (z. B. natürliche Person) fr: Forme juridique (p. ex. personne physique) it: Forma giuridica (ad es. persona fisica) en: Legal form (e.g. natural person) "
+          },
+          "registration_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registration Date",
+            "description": "de: Registrierungsdatum (Format: YYYY-MM-DD) fr: Date d'enregistrement (format: YYYY-MM-DD) it: Data di registrazione (formato: YYYY-MM-DD) en: Registration date (format: YYYY-MM-DD) "
+          },
+          "license_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LicenseType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Zulassung als fr: Autorisation en tant que it: Autorizzazione come en: Licensed as "
+          },
+          "insurance_lines": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/InsuranceLine"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Insurance Lines",
+            "description": "de: Versicherungssparten, für die der Vermittler registriert/autorisiert ist fr: Branches d'assurance pour lesquelles l'intermédiaire est enregistré/autorisée it: Rami assicurativi per cui l'intermediario è registrato/autorizzato en: Insurance lines the intermediary is registered/authorized for "
+          },
+          "affiliated_entities": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/EntityReference"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Affiliated Entities",
+            "description": "de: Verbundene Entitäten (z. B. Arbeitgeber oder Vermittler) fr: Entités associées (p. ex. employeur ou intermédiaire) it: Entità collegate (ad es. datore di lavoro o intermediario) en: Affiliated entities (e.g. employer or intermediary) "
+          }
+        },
+        "type": "object",
+        "title": "InsuranceIntermediary",
+        "description": "de: Datensatz eines Versicherungsvermittlers\nfr: Enregistrement d'un intermédiaire d'assurance\nit: Record di un intermediario assicurativo\nen: Insurance intermediary record"
+      },
+      "InsuranceLine": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InsuranceLineCode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Eindeutiger Code der Versicherungssparte fr: Code unique de la branche d'assurance it: Codice univoco del ramo assicurativo en: Unique code of the insurance line "
+          },
+          "label": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MultiLanguageLabel"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Mehrsprachige Bezeichnung der Versicherungssparte fr: Libellé multilingue de la branche d'assurance it: Etichetta multilingue del ramo assicurativo en: Multilingual label of the insurance line "
+          }
+        },
+        "type": "object",
+        "title": "InsuranceLine",
+        "description": "de: Mögliche Codes - LIFE = Lebensversicherung; QLIFE = Qualifizierte Lebensversicherung; HEALTH_ADDON = Krankenzusatzversicherung; AGRI = Ernteausfall-/Tierseuchenversicherung; MOTOR = Motorfahrzeugversicherung; REINSURANCE = Rückversicherung; DAMAGE = Schadensversicherung\nfr: Codes possibles - LIFE = Assurance vie; QLIFE = Assurance vie qualifiée; HEALTH_ADDON = Assurance complémentaire santé; AGRI = Assurance récolte / épizooties; MOTOR = Assurance automobile; REINSURANCE = Réassurance; DAMAGE = Assurance dommage\nit: Codici possibili - LIFE = Assicurazione vita; QLIFE = Assicurazione vita qualificata; HEALTH_ADDON = Assicurazione sanitaria complementare; AGRI = Assicurazione raccolto / malattie animali; MOTOR = Assicurazione veicoli a motore; REINSURANCE = Riassicurazione; DAMAGE = Assicurazione contro i danni\nen: Possible codes - LIFE = Life insurance; QLIFE = Qualified life insurance; HEALTH_ADDON = Supplementary health insurance; AGRI = Crop / livestock epidemic insurance; MOTOR = Motor insurance; REINSURANCE = Reinsurance; DAMAGE = Non-life insurance"
+      },
+      "InsuranceLineCode": {
+        "type": "string",
+        "enum": [
+          "LIFE",
+          "QLIFE",
+          "HEALTH_ADDON",
+          "AGRI",
+          "MOTOR",
+          "REINSURANCE",
+          "DAMAGE",
+          "UNDEFINED"
+        ],
+        "title": "InsuranceLineCode"
+      },
+      "Language": {
+        "type": "string",
+        "enum": [
+          "de",
+          "fr",
+          "it",
+          "en"
+        ],
+        "title": "Language"
+      },
+      "LegalForm": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LegalFormCode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Eindeutiger Code der Rechtsform fr: Code unique de la forme juridique it: Codice univoco della forma giuridica en: Unique code of the legal form "
+          },
+          "label": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MultiLanguageLabel"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Mehrsprachige Bezeichnung der Rechtsform fr: Libellé multilingue de la forme juridique it: Etichetta multilingue della forma giuridica en: Multilingual label of the legal form "
+          }
+        },
+        "type": "object",
+        "title": "LegalForm",
+        "description": "de: Mögliche Codes - NATURAL_PERSON = Natürliche Person; SOLE_PROP_REGISTERED = Einzelfirma (im Handelsregister eingetragen); SOLE_PROP_UNREGISTERED = Einzelfirma (nicht im Handelsregister eingetragen); AG = Aktiengesellschaft; GMBH = Gesellschaft mit beschränkter Haftung; ASSOCIATION = Verein; COOPERATIVE = Genossenschaft; FOUNDATION = Stiftung; GENERAL_PARTNERSHIP = Kollektivgesellschaft; LIMITED_PARTNERSHIP = Kommanditgesellschaft; SIMPLE_COMPANY = Einfache Gesellschaft; BRANCH = Zweigniederlassung; FOREIGN_LEGAL_STRUCTURE = Ausländische Rechtsform; PUBLIC_LAW_ENTITY = Körperschaft/Anstalt des öffentlichen Rechts; PUBLIC_LAW_JSC = Aktiengesellschaft des öffentlichen Rechts; UNKNOWN = Unbekannt\nfr: Codes possibles - NATURAL_PERSON = Personne physique; SOLE_PROP_REGISTERED = Entreprise individuelle (inscrite au registre du commerce); SOLE_PROP_UNREGISTERED = Entreprise individuelle (non inscrite au registre du commerce); AG = Société anonyme; GMBH = Société à responsabilité limitée; ASSOCIATION = Association; COOPERATIVE = Coopérative; FOUNDATION = Fondation; GENERAL_PARTNERSHIP = Société en nom collectif; LIMITED_PARTNERSHIP = Société en commandite; SIMPLE_COMPANY = Société simple; BRANCH = Succursale; FOREIGN_LEGAL_STRUCTURE = Forme juridique étrangère; PUBLIC_LAW_ENTITY = Entité de droit public; PUBLIC_LAW_JSC = Société anonyme de droit public; UNKNOWN = Inconnu\nit: Codici possibili - NATURAL_PERSON = Persona fisica; SOLE_PROP_REGISTERED = Ditta individuale (iscritta al registro di commercio); SOLE_PROP_UNREGISTERED = Ditta individuale (non iscritta al registro di commercio); AG = Società anonima; GMBH = Società a garanzia limitata; ASSOCIATION = Associazione; COOPERATIVE = Cooperativa; FOUNDATION = Fondazione; GENERAL_PARTNERSHIP = Società in nome collettivo; LIMITED_PARTNERSHIP = Società in accomandita; SIMPLE_COMPANY = Società semplice; BRANCH = Succursale; FOREIGN_LEGAL_STRUCTURE = Forma giuridica estera; PUBLIC_LAW_ENTITY = Ente di diritto pubblico; PUBLIC_LAW_JSC = Società anonima di diritto pubblico; UNKNOWN = Sconosciuto\nen: Possible codes - NATURAL_PERSON = Natural person; SOLE_PROP_REGISTERED = Sole proprietorship (registered in commercial register); SOLE_PROP_UNREGISTERED = Sole proprietorship (not registered in commercial register); AG = Joint stock company; GMBH = Limited liability company; ASSOCIATION = Association; COOPERATIVE = Cooperative; FOUNDATION = Foundation; GENERAL_PARTNERSHIP = General partnership; LIMITED_PARTNERSHIP = Limited partnership; SIMPLE_COMPANY = Simple partnership; BRANCH = Branch; FOREIGN_LEGAL_STRUCTURE = Foreign legal structure; PUBLIC_LAW_ENTITY = Public-law entity; PUBLIC_LAW_JSC = Joint stock corporation under public law; UNKNOWN = Unknown"
+      },
+      "LegalFormCode": {
+        "type": "string",
+        "enum": [
+          "NATURAL_PERSON",
+          "AG",
+          "GMBH",
+          "ASSOCIATION",
+          "FOUNDATION",
+          "COOPERATIVE",
+          "GENERAL_PARTNERSHIP",
+          "BRANCH",
+          "FOREIGN_LEGAL_STRUCTURE",
+          "PUBLIC_LAW_JSC",
+          "LIMITED_PARTNERSHIP",
+          "PUBLIC_LAW_ENTITY",
+          "SIMPLE_COMPANY",
+          "SOLE_PROP_REGISTERED",
+          "SOLE_PROP_UNREGISTERED",
+          "UNKNOWN",
+          "UNDEFINED"
+        ],
+        "title": "LegalFormCode"
+      },
+      "LicenseType": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LicenseTypeCode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Eindeutiger Code des Zulassungstyps fr: Code unique du type d'autorisation it: Codice univoco del tipo di autorizzazione en: Unique code of the license type "
+          },
+          "label": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MultiLanguageLabel"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Mehrsprachige Bezeichnung des Zulassungstyps fr: Libellé multilingue du type d'autorisation it: Etichetta multilingue del tipo di autorizzazione en: Multilingual label of the license type "
+          }
+        },
+        "type": "object",
+        "title": "LicenseType",
+        "description": "de: Mögliche Codes - INTERMEDIARY_UNTIED = Versicherungsvermittler:in ungebunden; INTERMEDIARY_TIED = Versicherungsvermittler:in gebunden; BROKERAGE = Versicherungsbroker:in\nfr: Codes possibles - INTERMEDIARY_UNTIED = Intermédiaire d'assurance non lié; INTERMEDIARY_TIED = Intermédiaire d'assurance lié; BROKERAGE = Courtier d'assurance\nit: Codici possibili - INTERMEDIARY_UNTIED = Intermediario assicurativo non legato; INTERMEDIARY_TIED = Intermediario assicurativo legato; BROKERAGE = Broker assicurativo\nen: Possible codes - INTERMEDIARY_UNTIED = Insurance intermediary (untied); INTERMEDIARY_TIED = Insurance intermediary (tied); BROKERAGE = Insurance brokerage"
+      },
+      "LicenseTypeCode": {
+        "type": "string",
+        "enum": [
+          "INTERMEDIARY_UNTIED",
+          "INTERMEDIARY_TIED",
+          "BROKERAGE",
+          "UNDEFINED"
+        ],
+        "title": "LicenseTypeCode"
+      },
+      "MultiLanguageLabel": {
+        "properties": {
+          "de": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "De",
+            "description": "German translation"
+          },
+          "fr": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fr",
+            "description": "French translation"
+          },
+          "it": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "It",
+            "description": "Italian translation"
+          },
+          "en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "En",
+            "description": "English translation"
+          }
+        },
+        "type": "object",
+        "title": "MultiLanguageLabel",
+        "description": "de: Mehrsprachiges Label mit Übersetzungen für de, fr, it, en\nfr: Libellé multilingue avec traductions pour de, fr, it, en\nit: Etichetta multilingue con traduzioni per de, fr, it, en\nen: Multilingual label with translations for de, fr, it, en"
+      },
+      "RelationType": {
+        "type": "string",
+        "enum": [
+          "EMPLOYER",
+          "EMPLOYEE",
+          "INTERMEDIARY",
+          "BROKER",
+          "AGENT",
+          "UNDEFINED"
+        ],
+        "title": "RelationType"
+      },
+      "SearchCategory": {
+        "type": "string",
+        "enum": [
+          "INTERMEDIARIES",
+          "BROKERAGES"
+        ],
+        "title": "SearchCategory"
+      },
+      "SearchResult": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "description": "de: Eindeutige Identifikationsnummer des Suchergebnisses fr: Identifiant unique du résultat de recherche it: Identificativo univoco del risultato di ricerca en: Unique identifier of the search result "
+          },
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SearchCategory"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Kategorie des Suchergebnisses (intermediaries oder brokerages) fr: Catégorie du résultat de recherche (intermediaries ou brokerages) it: Categoria del risultato di ricerca (intermediaries o brokerages) en: Category of the search result (intermediaries or brokerages) "
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name",
+            "description": "de: Anzeigename (z. B. Name oder Vor- und Nachname) fr: Nom affiché (par ex. nom ou prénom et nom) it: Nome visualizzato (es. nome o nome e cognome) en: Display name (e.g. company name or first and last name) "
+          },
+          "license_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LicenseType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Zulassung als fr: Autorisation en tant que it: Autorizzazione come en: Licensed as "
+          },
+          "legal_form": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LegalForm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "de: Rechtsnatur (z. B. natürliche Person) fr: Forme juridique (p. ex. personne physique) it: Forma giuridica (ad es. persona fisica) en: Legal form (e.g. natural person) "
+          }
+        },
+        "type": "object",
+        "title": "SearchResult",
+        "description": "de: Ergebnisobjekt einer Suche nach Vermittlern oder Brokerages\nfr: Objet de résultat d'une recherche d'intermédiaires ou de courtiers\nit: Oggetto risultato di una ricerca di intermediari o broker\nen: Result object of a search for intermediaries or brokerages"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
